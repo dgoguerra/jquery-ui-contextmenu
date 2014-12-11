@@ -28,6 +28,7 @@ $.widget("moogle.contextmenu", {
 	version: "@VERSION",
 	options: {
 		addClass: "ui-contextmenu",  // Add this class to the outer <ul>
+		triggerEvent: "contextmenu", // event to listen to open the menu
 		autoTrigger: true,    // open menu on browser's `contextmenu` event
 		delegate: null,       // selector
 		hide: { effect: "fadeOut", duration: "fast" },
@@ -93,7 +94,7 @@ $.widget("moogle.contextmenu", {
 		}
 		this._createUiMenu(opts.menu);
 
-		eventNames = "contextmenu" + this.eventNamespace;
+		eventNames = opts.triggerEvent + this.eventNamespace;
 		if (opts.taphold) {
 			eventNames += " taphold" + this.eventNamespace;
 		}
@@ -252,7 +253,7 @@ $.widget("moogle.contextmenu", {
 			.hide(); // hide again, so we can apply nice effects
 
 		if ( opts.preventContextMenuForPopup ) {
-			this.$menu.bind("contextmenu" + this.eventNamespace, function(event) {
+			this.$menu.bind(opts.triggerEvent + this.eventNamespace, function(event) {
 				event.preventDefault();
 			});
 		}
@@ -271,7 +272,7 @@ $.widget("moogle.contextmenu", {
 			.unbind("touchstart" + this.eventNamespace)
 			.unbind("keydown" + this.eventNamespace);
 		this.$menu
-			.unbind("contextmenu" + this.eventNamespace);
+			.unbind(this.options.triggerEvent + this.eventNamespace);
 		self.currentTarget = null; // issue #44 after hide animation is too late
 
 		this._hide(this.$menu, hideOpts, function() {
@@ -316,7 +317,7 @@ $.widget("moogle.contextmenu", {
 	open: function(target, extraData) {
 		// Fake a 'contextmenu' event
 		extraData = extraData || {};
-		var e = jQuery.Event("contextmenu", { target: target.get(0), extraData: extraData });
+		var e = jQuery.Event(this.options.triggerEvent, { target: target.get(0), extraData: extraData });
 		return this.element.trigger(e);
 	},
 	/** Replace the menu altogether. */
